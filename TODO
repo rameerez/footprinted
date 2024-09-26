@@ -1,0 +1,3 @@
+✘ Add index on users t.index ["user_id"], name: "index_trackable_activities_on_user_id" @cancelled(24-09-26 16:59)
+☐ make user:references optional in migration (activities may not have an associated user)
+✔ can they have multiple activity types per model? (user: profile_views, downloads, etc) @done(24-09-26 17:28)
