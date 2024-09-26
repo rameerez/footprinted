@@ -2,21 +2,29 @@
 
 `footprinted` is a Ruby gem that provides a simple and elegant way to track user activity with associated IP addresses.
 
-Think user profiles – `footprinted` allows you to add `has_trackable :views` in your User model, so you can trigger `@profile.track_view(request.remote_ip)` in your controller – to later compile stats on from where the profile has been visited.
+Example: think user profiles – this gem allows you to add
+```ruby
+has_trackable :profile_views
+```
 
-It seamlessly integrates with your existing Rails models, allowing you to add trackable actions with minimal setup.
+to your User model, so you can call:
+```ruby
+@profile.track_profile_view(request.remote_ip)
+```
 
-## Features
+in your controller and track profile views with geolocation.
 
-- 🔍 Easy-to-use model concern for tracking activities
-- 🌍 IP geolocation using the [`trackdown`](https://github.com/rameerez/trackdown) gem
-- 🚀 Customizable tracking associations
-- 🛠 Generator for easy setup and migration
-- 📊 Simple API for recording and querying tracked activities
+You can then easily compile stats on from where the profile has been visited, like:
+```ruby
+user.profile_views.group(:country).count
+# => { 'US'=>529, 'UK'=>291, 'CA'=>78... }
+```
+
+`footprinted` seamlessly integrates with your existing Rails models, allowing you to add multiple trackable actions with minimal setup.
 
 ## Installation
 
-This gem depends on the [`trackdown`](https://github.com/rameerez/trackdown) gem for locating IPs. First, install `trackdown` and make sure you have a valid installation with a working MaxMind database, so we can get geolocation data from the IPs.
+This gem depends on the [`trackdown`](https://github.com/rameerez/trackdown) gem for locating IPs. To begin with, follow the `trackdown` README to install the gem, and make sure you have a valid installation with a working MaxMind database – otherwise we won't be able to get geolocation data from IPs.
 
 Then, add this line to your application's Gemfile:
 
@@ -50,8 +58,6 @@ rails db:migrate
 
 ## Usage
 
-### Basic Usage
-
 Include the `Footprinted::Model` concern in your model and set what kind of activity you're tracking:
 ```ruby
 class User < ApplicationRecord
@@ -60,7 +66,7 @@ class User < ApplicationRecord
 end
 ```
 
-The `has_trackable :profile_views` association automatically provides you with a `track_profile_view` method you can use:
+The `has_trackable :profile_views` association automatically provides you with a `track_profile_view` method that you can use:
 ```ruby
 user = user.find(1)
 user.track_profile_view(ip: '8.8.8.8')
@@ -80,17 +86,6 @@ user.profile_views.group(:country).count
 If you want to also save which user triggered the activity, you can do so with:
 ```ruby
 user.track_profile_view(ip: '8.8.8.8', user: @user)
-```
-
-## Configuration
-
-You can configure Footprinted in the `config/initializers/footprinted.rb` file:
-
-```ruby
-Footprinted.configure do |config|
-  config.ip_lookup_service = :trackdown # Default
-  # Add any other configuration options here
-end
 ```
 
 ## Development
