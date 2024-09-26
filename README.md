@@ -1,6 +1,6 @@
-# 👣 `footprinted` - Ruby gem to track IP-geolocated user activity
+# 👣 `footprinted` - Ruby gem to track geolocated user activity
 
-`footprinted` is a Ruby gem that provides a simple and elegant way to track user activity with associated IP addresses.
+`footprinted` is a Ruby gem that provides a simple and elegant way to track user activity with associated IP addresses and geo data.
 
 Example: think user profiles – this gem allows you to add
 ```ruby
