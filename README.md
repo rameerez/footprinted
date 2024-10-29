@@ -24,9 +24,12 @@ user.profile_views.group(:country).count
 
 ## Installation
 
-This gem depends on the [`trackdown`](https://github.com/rameerez/trackdown) gem for locating IPs. To begin with, follow the `trackdown` README to install the gem, and make sure you have a valid installation with a working MaxMind database – otherwise we won't be able to get geolocation data from IPs.
+> [!IMPORTANT]
+> This gem depends on the [`trackdown`](https://github.com/rameerez/trackdown) gem for locating IPs.
+>
+> **Start by following the `trackdown` README to install and configure the gem**, and make sure you have a valid installation with a working MaxMind database before continuing – otherwise we won't be able to get any geolocation data from IPs.
 
-Then, add this line to your application's Gemfile:
+After [`trackdown`](https://github.com/rameerez/trackdown) is installed and configured, add this line to your application's Gemfile:
 
 ```ruby
 gem 'footprinted'
