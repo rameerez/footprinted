@@ -55,8 +55,12 @@ module Footprinted
                  as: :trackable, class_name: 'Footprinted::TrackableActivity'
 
         # Define a custom method for tracking activities of this type
-        define_method(track_method_name) do |ip:, user: nil|
-          send(association_name).create(ip: ip, user: user, activity_type: association_name.to_s.singularize)
+        define_method(track_method_name) do |ip:, performer: nil|
+          send(association_name).create!(
+            ip: ip,
+            performer: performer,
+            activity_type: association_name.to_s.singularize
+          )
         end
       end
     end
