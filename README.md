@@ -34,9 +34,9 @@ That's it! This is all you need for `footprinted` to store the profile view alon
 
 ## How it works
 
-`footprinted` relies on a `trackable_activities` table, and provides a model mixin to interact with it.
+`footprinted` relies on a `trackable_activities` table, and provides a model concern to interact with it.
 
-This model mixin allows you to define polymorphic associations to store activity data associated with any model.
+This model concern allows you to define polymorphic associations to store activity data associated with any model.
 
 For each activity, `footprinted` stores:
 - IP address
@@ -77,7 +77,7 @@ This will create a migration file to create the polymorphic `trackable_activitie
 
 ### Basic Setup
 
-Include the concern and declare what you want to track:
+Include the `Footprinted::Model` concern and declare what you want to track:
 
 ```ruby
 class User < ApplicationRecord
