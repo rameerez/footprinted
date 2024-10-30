@@ -30,17 +30,18 @@ module Footprinted
     def self.countries
       distinct.where.not(country: nil).pluck(:country)
     end
+
     private
 
     def set_geolocation_data
       return unless ip.present?
 
       unless defined?(Trackdown)
-        raise Footprinted::Error, "Trackdown gem is not installed. Please add `gem 'trackdown'` to your Gemfile."
+        raise Footprinted::Error, "The Trackdown gem is not installed. Please add `gem 'trackdown'` to your Gemfile and follow the setup instructions to configure the gem and download an IP geolocation database."
       end
 
       unless Trackdown.database_exists?
-        raise Footprinted::Error, "Trackdown database not found. Please follow the Trackdown gem setup instructions to configure the gem and download an IP geolocation database."
+        raise Footprinted::Error, "MaxMind IP geolocation database not found. Please follow the Trackdown gem setup instructions to configure the gem and download an IP geolocation database."
       end
 
       location = Trackdown.locate(ip.to_s)
