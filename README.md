@@ -8,7 +8,7 @@ It's perfect for tracking profile views, downloads, login attempts, or any user 
 
 Sometimes you need to know where your users are performing certain actions from.
 
-For example, let's assume users have profiles. Where has a particular profile been viewed from?
+For example, let's say you have users with user profiles. Where has a particular profile been viewed from?
 
 This gem makes it trivial to track and analyze this kind of data:
 
@@ -24,7 +24,7 @@ This gem makes it trivial to track and analyze this kind of data:
 @user.profile_views.by_country('US')
 ```
 
-`footprinted` does all the heavy lifting for you, so you don't need to define any models or associations.
+`footprinted` does all the heavy lifting for you, so you don't need to define any models or associations. Just track and query.
 
 ## How
 
@@ -36,17 +36,18 @@ To track profile views in your User model, just add:
 has_trackable :profile_views
 ```
 
-This will automatically add a `profile_views` association to your User model, and a `track_profile_view` method.
+This will automatically add a `profile_views` association and a `track_profile_view` method to your User model.
 
 You can then track profile views like this:
 
 ```ruby
+# In your controller
 @user.track_profile_view(request.remote_ip)
 ```
 
-This will store the event, along with the IP address and geolocation data associated with each profile view.
+That's it! `footprinted` will store the view along with the IP's geolocation data.
 
-Then, as we've seen above, you can query the tracked activity with the `profile_views` association:
+You can then analyze the data:
 
 ```ruby
 user.profile_views.group(:country).count
@@ -113,13 +114,17 @@ class User < ApplicationRecord
 end
 ```
 
-`footprinted` generates methods for you. For example, the `has_trackable :profile_views` association automatically provides you with a `track_profile_view` method that you can use:
+### Recording Activity
+
+`footprinted` generates methods for you.
+
+For example, the `has_trackable :profile_views` association automatically provides you with a `track_profile_view` method that you can use:
 
 ```ruby
 # Basic tracking with IP
 user.track_profile_view(ip: request.remote_ip)
 
-# Track with a performer (who triggered the activity)
+# Or track with a performer as well ("who triggered the activity?")
 user.track_profile_view(
   ip: request.remote_ip,
   performer: current_user
@@ -131,50 +136,22 @@ user.track_profile_view(
 #### Basic Queries
 
 ```ruby
-# Get all profile views
-user.profile_views
-
-# Get recent activity first
+# Basic queries
 user.profile_views.recent
-
-# Get activity from last X days
 user.profile_views.last_days(7)
-
-# Get activity between dates
 user.profile_views.between(1.week.ago, Time.current)
-```
 
-#### Location-based Queries
-
-```ruby
-# Get activity from a specific country
+# Location queries
 user.profile_views.by_country('US')
+user.profile_views.countries  # => ['US', 'UK', 'CA', ...]
 
-# Get activity grouped by country
-user.profile_views.group(:country).count
-# => { 'US'=>529, 'UK'=>291, 'CA'=>78... }
-
-# Get all countries with activity
-user.profile_views.countries
-# => ['US', 'UK', 'CA', ...]
-```
-
-#### Performer Queries
-
-```ruby
-# Get activity by a specific performer
+# Performer queries
 user.profile_views.performed_by(some_user)
-
-# Group by performer
-user.profile_views
-  .joins(:performer)
-  .group('performers_trackable_activities.id')
-  .count
 ```
 
 ### Advanced Usage
 
-#### Working with Multiple Activity Types
+Track multiple activity types:
 
 ```ruby
 class Resource < ApplicationRecord
@@ -184,20 +161,16 @@ class Resource < ApplicationRecord
   has_trackable :previews
 end
 
-# Track different activities
-resource.track_download(ip: request.remote_ip)
-resource.track_preview(ip: request.remote_ip)
+# Track activities
+product.track_download(ip: request.remote_ip)
+product.track_preview(ip: request.remote_ip)
 
-# Query specific activity types
-resource.downloads.count
-resource.previews.last_days(30)
-
-# Get all activity types recorded
-resource.trackable_activities.activity_types
-# => ['download', 'preview']
+# Query activities
+product.downloads.count
+product.previews.last_days(30)
 ```
 
-#### Time-based Analysis
+Time-based analysis:
 
 ```ruby
 # Daily activity for the last 30 days
