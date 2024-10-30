@@ -1,76 +1,55 @@
 # 👣 `footprinted` - Track geolocated user activity in Rails
 
-`footprinted` provides a simple and elegant way to track user activity with associated IP addresses and geolocation data in your Rails app.
+`footprinted` provides a simple way to track user activity with associated IP addresses and geolocation data in your Rails app.
 
-It's perfect for tracking profile views, downloads, login attempts, or any user interaction where location matters.
+It's good for tracking profile views, downloads, login attempts, or any user interaction where location matters.
 
 ## Why
 
 Sometimes you need to know where your users are performing certain actions from.
 
-For example, let's say you have users with user profiles. Where has a particular profile been viewed from?
+For example, let's say your users have profiles. Where has a particular profile been viewed from?
 
 This gem makes it trivial to track and analyze this kind of data:
 
 ```ruby
-# Get views by country
+# First, add this to your User model
+has_trackable :profile_views
+
+# Then, track the activity in the controller
+@user.track_profile_view(request.remote_ip)
+
+# And finally, analyze the data
 @user.profile_views.group(:country).count
 # => { 'US'=>529, 'UK'=>291, 'CA'=>78... }
-
-# Get recent profile views
-@user.profile_views.last_days(7)
-
-# Get views from a specific country
-@user.profile_views.by_country('US')
 ```
 
-`footprinted` does all the heavy lifting for you, so you don't need to define any models or associations. Just track and query.
+That's it! This is all you need for `footprinted` to store the view along with the IP's geolocation data.
 
 ## How
 
-Continuing with the profile views example:
+By adding `has_trackable :profile_views` to your model, `footprinted` automatically creates a `profile_views` association and a `track_profile_view` method to your User model.
 
-To track profile views in your User model, just add:
+`footprinted` does all the heavy lifting for you, so you don't need to define any models or associations. Just track and query.
 
-```ruby
-has_trackable :profile_views
-```
-
-This will automatically add a `profile_views` association and a `track_profile_view` method to your User model.
-
-You can then track profile views like this:
-
-```ruby
-# In your controller
-@user.track_profile_view(request.remote_ip)
-```
-
-That's it! `footprinted` will store the view along with the IP's geolocation data.
-
-You can then analyze the data:
-
-```ruby
-user.profile_views.group(:country).count
-# => { 'US'=>529, 'UK'=>291, 'CA'=>78... }
-```
-
-`footprinted` seamlessly integrates with your existing Rails models, allowing you to add multiple trackable actions with minimal setup.
 
 ## What
 
-What `footprinted` provides is essentially a model mixin that defines a polymorphic association to store activity data associated with any model. Each of these activity datapoints includes an IP address and associated geolocation data.
+What `footprinted` provides is a `trackable_activities` table, along with a model mixin.
 
-This data gets stored in a table named `trackable_activities`.
+This model mixin allows you to define polymorphic associations to store activity data associated with any model.
 
-For each activity, this gets stored:
+Each of these activity datapoints stores:
 - IP address
 - Country
 - City
 - Activity type
 - Event timestamp
-- Optionally, an associated `performer` record, which could be a `user`, `admin`, or any other model. It answers the question: who triggered this activity?
+- Optionally, an associated `performer` record, which could be a `user`, `admin`, or any other model. It answers the question: "who triggered this activity?"
 
-For your convenience, `footprinted` provides named methods that interact with the `trackable_activities` table to save and query this data (like `track_profile_view` and `profile_views`). But it could also be queried and saved by directly interacting with the `trackable_activities` relationship.
+For your convenience, `footprinted` also provides named methods that interact with the `trackable_activities` table to save and query this data.
+
+For example,`has_trackable :profile_views` will generate the `profile_views` association and the `track_profile_view` method. `has_trackable :downloads` will generate the `downloads` association and the `track_download` method.
 
 ## Installation
 
