@@ -1,0 +1,30 @@
+class CreateFootprintedTrackableActivities < ActiveRecord::Migration<%= migration_version %>
+  def change
+    primary_key_type, foreign_key_type = primary_and_foreign_key_types
+
+    create_table :trackable_activities, id: primary_key_type do |t|
+      t.inet :ip, null: false
+      t.text :country
+      t.text :city
+      t.references :trackable, polymorphic: true, null: false, type: foreign_key_type, index: true
+      t.references :performer, polymorphic: true, type: foreign_key_type, index: true
+      t.text :activity_type, null: false
+
+      t.timestamps
+    end
+
+    add_index :trackable_activities, [:trackable_type, :trackable_id, :activity_type]
+    add_index :trackable_activities, :activity_type
+    add_index :trackable_activities, :country
+  end
+
+  private
+
+  def primary_and_foreign_key_types
+    config = Rails.configuration.generators
+    setting = config.options[config.orm][:primary_key_type]
+    primary_key_type = setting || :primary_key
+    foreign_key_type = setting || :bigint
+    [primary_key_type, foreign_key_type]
+  end
+end
