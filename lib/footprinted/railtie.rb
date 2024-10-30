@@ -8,10 +8,6 @@ module Footprinted
       end
     end
 
-    rake_tasks do
-      load "tasks/footprinted_tasks.rake"
-    end
-
     generators do
       require "generators/footprinted/install_generator"
     end

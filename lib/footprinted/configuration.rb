@@ -2,10 +2,9 @@
 
 module Footprinted
   class Configuration
-    attr_accessor :ip_lookup_service
 
     def initialize
-      @ip_lookup_service = :trackdown
+      # No configuration options yet
     end
   end
 end
