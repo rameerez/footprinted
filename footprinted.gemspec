@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["rameerez"]
   spec.email = ["rubygems@rameerez.com"]
 
-  spec.summary = "Track IP-geolocated user activity"
-  spec.description = "Track user activity with associated IP addresses and geolocation info, easily and with minimal setup"
+  spec.summary = "Track IP-geolocated user activity in your Rails app"
+  spec.description = "Track user activity with associated IP addresses and geolocation info, easily and with minimal setup. It's good for tracking profile views, downloads, login attempts, or any user interaction where location matters."
   spec.homepage = "https://github.com/rameerez/footprinted"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
@@ -38,7 +38,4 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "rubocop", "~> 1.7"
-
-  # For more information and examples about making a new gem, check out our
-  # guide at: https://bundler.io/guides/creating_gem.html
 end

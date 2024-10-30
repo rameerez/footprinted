@@ -146,6 +146,7 @@ product.track_preview(ip: request.remote_ip)
 # Query activities
 product.downloads.count
 product.previews.last_days(30)
+product.downloads.between(1.week.ago, Time.current)
 ```
 
 Time-based analysis:
