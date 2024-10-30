@@ -17,7 +17,7 @@ This gem makes it trivial to track and analyze this kind of data:
 has_trackable :profile_views
 
 # Then, track the activity in the controller
-@user.track_profile_view(request.remote_ip)
+@user.track_profile_view(ip: request.remote_ip)
 
 # And finally, analyze the data
 @user.profile_views.group(:country).count
