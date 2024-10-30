@@ -24,22 +24,21 @@ has_trackable :profile_views
 # => { 'US'=>529, 'UK'=>291, 'CA'=>78... }
 ```
 
-That's it! This is all you need for `footprinted` to store the view along with the IP's geolocation data.
+That's it! This is all you need for `footprinted` to store the profile view along with the IP's geolocation data.
 
-## How
+> [!NOTE]
+> By adding `has_trackable :profile_views` to your model, `footprinted` automatically creates a `profile_views` association and a `track_profile_view` method to your User model.
+>
+> `footprinted` does all the heavy lifting for you, so you don't need to define any models or associations. Just track and query.
 
-By adding `has_trackable :profile_views` to your model, `footprinted` automatically creates a `profile_views` association and a `track_profile_view` method to your User model.
 
-`footprinted` does all the heavy lifting for you, so you don't need to define any models or associations. Just track and query.
+## How it works
 
-
-## What
-
-What `footprinted` provides is a `trackable_activities` table, along with a model mixin.
+`footprinted` relies on a `trackable_activities` table, and provides a model mixin to interact with it.
 
 This model mixin allows you to define polymorphic associations to store activity data associated with any model.
 
-Each of these activity datapoints stores:
+For each activity, `footprinted` stores:
 - IP address
 - Country
 - City
@@ -47,9 +46,9 @@ Each of these activity datapoints stores:
 - Event timestamp
 - Optionally, an associated `performer` record, which could be a `user`, `admin`, or any other model. It answers the question: "who triggered this activity?"
 
-For your convenience, `footprinted` also provides named methods that interact with the `trackable_activities` table to save and query this data.
+`footprinted` also provides named methods that interact with the `trackable_activities` table to save and query this data.
 
-For example,`has_trackable :profile_views` will generate the `profile_views` association and the `track_profile_view` method. `has_trackable :downloads` will generate the `downloads` association and the `track_download` method.
+For example, `has_trackable :profile_views` will generate the `profile_views` association and the `track_profile_view` method. Similarly, `has_trackable :downloads` will generate the `downloads` association and the `track_download` method.
 
 ## Installation
 
