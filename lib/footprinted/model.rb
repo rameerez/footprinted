@@ -34,7 +34,7 @@ module Footprinted
     # - has_trackable(association_name): Sets up a custom association for tracking activities.
     #   This method dynamically defines a tracking method based on the given association name.
     #
-    # - track_activity(ip, user = nil): Default method provided to track activities. It logs
+    # - track_activity(ip, user = nil, activity_type = nil): Default method provided to track activities. It logs
     #   the IP address, and optionally, the user involved in the activity. This method can be
     #   overridden in the model including this module for custom behavior.
     #
@@ -66,8 +66,8 @@ module Footprinted
     end
 
     # Fallback method for tracking activity. This will be overridden if has_trackable is called.
-    def track_activity(ip:, user: nil, activity_type: nil)
-      trackable_activities.create(ip: ip, user: user, activity_type: activity_type)
+    def track_activity(ip:, performer: nil, activity_type: nil)
+      trackable_activities.create(ip: ip, performer: performer, activity_type: activity_type)
     end
   end
 end
