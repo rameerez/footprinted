@@ -2,9 +2,10 @@
 
 module Footprinted
   class Configuration
+    attr_accessor :async
 
     def initialize
-      # No configuration options yet
+      @async = false
     end
   end
 end

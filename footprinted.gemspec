@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["rubygems@rameerez.com"]
 
   spec.summary = "Track IP-geolocated user activity in your Rails app"
-  spec.description = "Track user activity with associated IP addresses and geolocation info, easily and with minimal setup. It's good for tracking profile views, downloads, login attempts, or any user interaction where location matters."
+  spec.description = "Track user activity with associated IP addresses, geolocation info, and metadata, easily and with minimal setup. Supports async tracking via ActiveJob. It's good for tracking profile views, downloads, login attempts, or any user interaction where location matters."
   spec.homepage = "https://github.com/rameerez/footprinted"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
@@ -33,9 +33,8 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "rails", ">= 7.0"
-  spec.add_dependency "trackdown", "~> 0.1"
+  spec.metadata["rubygems_mfa_required"] = "true"
 
-  spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "rubocop", "~> 1.7"
+  spec.add_dependency "rails", ">= 7.0"
+  spec.add_dependency "trackdown", "~> 0.2"
 end
