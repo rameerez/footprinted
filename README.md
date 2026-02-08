@@ -5,21 +5,32 @@
 > [!TIP]
 > **🚀 Ship your next Rails app 10x faster!** I've built **[RailsFast](https://railsfast.com/?ref=footprinted)**, a production-ready Rails boilerplate template that comes with everything you need to launch a software business in days, not weeks. Go [check it out](https://railsfast.com/?ref=footprinted)!
 
-`footprinted` makes it trivial to attach event tracking to any Rails model. Every event records the IP address, full geolocation data (country, city, region, coordinates, timezone), arbitrary JSONB metadata, and who triggered it — all resolved automatically via [`trackdown`](https://github.com/rameerez/trackdown).
+`footprinted` makes it trivial to add event tracking to any Rails model.
 
-It's great for usage analytics, audit logs, license activations, download tracking, login attempts, or any interaction where knowing the *where* matters.
+Think of a file transfer app like WeTransfer. You may want to track where every file download came from:
 
 ```ruby
 # Add to your model
 has_trackable :downloads
 
 # Track events in the controller
-@product.track_download(ip: request.remote_ip, metadata: { version: "2.1.0" })
+@file.track_download(ip: request.remote_ip, metadata: { version: "2.1.0" })
 
 # Query the data
-@product.downloads.by_country("US").last_days(30).count
+@file.downloads.by_country("US").last_days(30).count
 # => 42
 ```
+
+In the example above, `footprinted` adds `footprints` to your `File` model, allowing you to easily record event data; and provides you with methods to build dashboards and analytics / business intelligence systems.
+
+More use cases:
+- Track login attempts
+- Track profile views in a social app (think: LinkedIn)
+- Track document open events in a file-signing app (think: DocuSign)
+- Track any business-critical operation for enterprise-compliant audit logs
+- Track any interaction where knowing the *where* (IP, geolocation) or *what* (OS, app version, device ID...) matters
+
+Every event (footprint) in `footprinted` records the IP address, full geolocation data (country, city, region, coordinates, timezone), arbitrary JSONB metadata, and who triggered it — all resolved automatically via [`trackdown`](https://github.com/rameerez/trackdown). `footprinted` allows you to trivially build analytics dashboards and audit logs for all your app events.
 
 > [!NOTE]
 > By adding `has_trackable :downloads` to your model, `footprinted` automatically creates a `downloads` scoped association and a `track_download` method. No extra models or associations to define. Just track and query.

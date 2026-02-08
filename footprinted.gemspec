@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["rameerez"]
   spec.email = ["rubygems@rameerez.com"]
 
-  spec.summary = "Track geolocated events with metadata in your Rails app"
-  spec.description = "Attach event tracking to any Rails model with automatic IP geolocation, JSONB metadata, polymorphic associations, and async support via ActiveJob. Great for analytics, audit logs, license activations, downloads, or any interaction where knowing the where matters."
+  spec.summary = "Track events with IP geolocation and metadata in your Rails app"
+  spec.description = "Add event tracking to any Rails model easily. Every event adds automatic IP geolocation, and any arbitrary metadata you may want to add. The gem comes with polymorphic associations, and async support via ActiveJob, so you can track events in the background without any overhead. Great for tracking login attempts, file downloads, profile visits, or any interaction where knowing the where matters. It also allows you to trivially build analytics dashboards and audit logs for all your app events."
   spec.homepage = "https://github.com/rameerez/footprinted"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
