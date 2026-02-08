@@ -3,7 +3,7 @@
 require_relative "footprinted/version"
 require_relative "footprinted/configuration"
 require_relative "footprinted/model"
-require_relative "footprinted/trackable_activity"
+require_relative "footprinted/footprint"
 
 module Footprinted
   class Error < StandardError; end

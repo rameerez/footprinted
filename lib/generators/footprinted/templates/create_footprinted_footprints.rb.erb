@@ -1,0 +1,43 @@
+class CreateFootprintedFootprints < ActiveRecord::Migration<%%= migration_version %>
+  def change
+    primary_key_type, foreign_key_type = primary_and_foreign_key_types
+
+    create_table :footprints, id: primary_key_type do |t|
+      t.inet    :ip
+      t.string  :country_code,  limit: 2
+      t.string  :country_name
+      t.string  :city
+      t.string  :region
+      t.string  :continent,     limit: 2
+      t.string  :timezone
+      t.decimal :latitude,  precision: 10, scale: 7
+      t.decimal :longitude, precision: 10, scale: 7
+
+      t.references :trackable, polymorphic: true, null: false, type: foreign_key_type, index: true
+      t.references :performer, polymorphic: true, type: foreign_key_type, index: true
+
+      t.string  :event_type, null: false
+      t.jsonb   :metadata,   null: false, default: {}
+      t.datetime :occurred_at, null: false
+
+      t.timestamps
+    end
+
+    add_index :footprints, [:trackable_type, :trackable_id, :event_type, :occurred_at],
+              name: "idx_footprints_trackable_event_time"
+    add_index :footprints, :event_type
+    add_index :footprints, :occurred_at
+    add_index :footprints, :country_code
+    add_index :footprints, :metadata, using: :gin
+  end
+
+  private
+
+  def primary_and_foreign_key_types
+    config = Rails.configuration.generators
+    setting = config.options[config.orm][:primary_key_type]
+    primary_key_type = setting || :primary_key
+    foreign_key_type = setting || :bigint
+    [primary_key_type, foreign_key_type]
+  end
+end
