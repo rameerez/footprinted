@@ -1,12 +1,5 @@
 # Changelog
 
-## [0.2.1] - 2026-02-08
-
-- Revamp README with performance-at-scale docs, column promotion pattern, and database compatibility table
-- Update gemspec for generic event tracking description
-- Bump trackdown dependency to ~> 0.3
-- Remove Gemfile.lock from git
-
 ## [0.2.0] - 2026-02-08
 
 **Full rewrite.** Breaking changes from v0.1.0.
@@ -22,6 +15,7 @@
 - Add class methods: `.event_types`, `.countries`
 - Add async mode with `Footprinted::TrackJob` (ActiveJob)
 - Require trackdown ~> 0.3 for full geo field support
+- Document JSONB performance at scale, column promotion pattern, and database compatibility
 
 ### Breaking changes
 
