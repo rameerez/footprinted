@@ -1,35 +1,32 @@
-# 👣 `footprinted` - Track geolocated user activity in your Rails app
+# 👣 `footprinted` - Track events with geolocation and metadata in your Rails app
 
 [![Gem Version](https://badge.fury.io/rb/footprinted.svg)](https://badge.fury.io/rb/footprinted) [![Build Status](https://github.com/rameerez/footprinted/workflows/Tests/badge.svg)](https://github.com/rameerez/footprinted/actions)
 
 > [!TIP]
 > **🚀 Ship your next Rails app 10x faster!** I've built **[RailsFast](https://railsfast.com/?ref=footprinted)**, a production-ready Rails boilerplate template that comes with everything you need to launch a software business in days, not weeks. Go [check it out](https://railsfast.com/?ref=footprinted)!
 
-`footprinted` makes it trivial to track user activity with associated IP addresses, geolocation data, and arbitrary metadata in your Rails app. It's great for tracking profile views, downloads, login attempts, license activations, or any user interaction where knowing the location matters.
+`footprinted` makes it trivial to attach event tracking to any Rails model. Every event records the IP address, full geolocation data (country, city, region, coordinates, timezone), arbitrary JSONB metadata, and who triggered it — all resolved automatically via [`trackdown`](https://github.com/rameerez/trackdown).
+
+It's great for usage analytics, audit logs, license activations, download tracking, login attempts, or any interaction where knowing the *where* matters.
 
 ```ruby
 # Add to your model
-has_trackable :profile_views
+has_trackable :downloads
 
-# Track activity in the controller
-@user.track_profile_view(ip: request.remote_ip)
+# Track events in the controller
+@product.track_download(ip: request.remote_ip, metadata: { version: "2.1.0" })
 
 # Query the data
-@user.profile_views.by_country("US").last_days(30).count
+@product.downloads.by_country("US").last_days(30).count
 # => 42
 ```
 
-That's it! `footprinted` stores the activity along with the IP's full geolocation data, all automatically resolved via [Trackdown](https://github.com/rameerez/trackdown).
-
 > [!NOTE]
-> By adding `has_trackable :profile_views` to your model, `footprinted` automatically creates a `profile_views` scoped association and a `track_profile_view` method. No extra models or associations to define. Just track and query.
+> By adding `has_trackable :downloads` to your model, `footprinted` automatically creates a `downloads` scoped association and a `track_download` method. No extra models or associations to define. Just track and query.
 
 ## Installation
 
-> [!IMPORTANT]
-> This gem depends on [`trackdown`](https://github.com/rameerez/trackdown) for IP geolocation. **Install and configure `trackdown` first** (follow its README), making sure you have a working MaxMind database before continuing.
-
-After `trackdown` is set up, add this to your Gemfile:
+Add this to your Gemfile:
 
 ```ruby
 gem "footprinted"
@@ -45,25 +42,29 @@ rails db:migrate
 
 This creates the `footprints` table with columns for IP, geolocation fields, event type, JSONB metadata, polymorphic trackable/performer references, and all the necessary indexes.
 
+> [!IMPORTANT]
+> This gem depends on [`trackdown`](https://github.com/rameerez/trackdown) for IP geolocation. `trackdown` works out of the box with Cloudflare (zero config) and also supports MaxMind. See the [trackdown README](https://github.com/rameerez/trackdown) for setup instructions.
+
 ## Quick Start
 
 Include the concern in any model you want to track activity on:
 
 ```ruby
-class User < ApplicationRecord
+class Product < ApplicationRecord
   include Footprinted::Model
 
-  has_trackable :profile_views
+  has_trackable :activations
+  has_trackable :downloads
 end
 ```
 
-Track activity in your controller:
+Track events in your controller:
 
 ```ruby
-class UsersController < ApplicationController
-  def show
-    @user = User.find(params[:id])
-    @user.track_profile_view(ip: request.remote_ip)
+class DownloadsController < ApplicationController
+  def create
+    @product = Product.find(params[:product_id])
+    @product.track_download(ip: request.remote_ip, metadata: { version: params[:version] })
   end
 end
 ```
@@ -71,10 +72,10 @@ end
 Query the data:
 
 ```ruby
-@user.profile_views.count                    # => 847
-@user.profile_views.by_country("US").count   # => 529
-@user.profile_views.last_days(7)             # recent views
-@user.profile_views.countries                # => ["US", "UK", "CA", ...]
+@product.downloads.count                    # => 847
+@product.downloads.by_country("US").count   # => 529
+@product.downloads.last_days(7)             # recent downloads
+@product.downloads.countries                # => ["US", "UK", "CA", ...]
 ```
 
 ## `has_trackable` DSL
@@ -154,7 +155,7 @@ It accepts the same parameters as `track_<event_type>` and works with both symbo
 @user.footprints.performed_by(some_user)
 ```
 
-Scopes are chainable, so you can combine them:
+Scopes are chainable:
 
 ```ruby
 @user.profile_views
@@ -181,32 +182,73 @@ Footprinted::Footprint.countries
 Every footprint can store arbitrary metadata as JSONB. This is great for device info, SDK versions, or any context you want to associate with the event:
 
 ```ruby
-@license.track(:activation, ip: request.remote_ip, metadata: {
-  sdk_version: "0.4.0",
-  os_name: "macOS",
-  os_version: "15.2",
-  device_model: "Mac15,3",
+@product.track(:activation, ip: request.remote_ip, metadata: {
+  device_id: "A1B2C3",
   app_version: "2.1.0",
-  locale: "en_US",
-  timezone: "America/Los_Angeles"
+  platform: "macOS",
+  os_version: "15.2",
+  sdk_version: "0.4.0",
+  locale: "en_US"
 })
 ```
 
-You can query metadata using your database's JSON operators. For example, with PostgreSQL:
+Query metadata using your database's JSON operators:
 
 ```ruby
-# Find activations from macOS devices
-@license.footprints
+# Find activations from macOS
+@product.footprints
   .by_event("activation")
-  .where("metadata->>'os_name' = ?", "macOS")
+  .where("metadata->>'platform' = ?", "macOS")
 
-# Group by SDK version
-@license.footprints
+# Group by app version
+@product.footprints
   .by_event("activation")
-  .group("metadata->>'sdk_version'")
+  .group("metadata->>'app_version'")
   .count
-# => { "0.3.0" => 12, "0.4.0" => 45 }
+# => { "2.0.0" => 12, "2.1.0" => 45 }
 ```
+
+### Performance at scale
+
+The default migration creates a [GIN index](https://www.postgresql.org/docs/current/gin-intro.html) on the `metadata` column. GIN indexes are excellent for **containment queries** (`@>`, `?`, `?|`) but do **not** speed up key extraction queries like `GROUP BY metadata->>'field'` or `COUNT(DISTINCT metadata->>'field')`.
+
+For small-to-medium tables (up to hundreds of thousands of rows), JSONB queries work just fine. At larger scale (millions of rows), if you're frequently grouping or counting distinct values on specific metadata keys, you have two options:
+
+**Option 1: Expression indexes** — add B-tree indexes on the specific JSONB keys you query most. No schema change needed:
+
+```ruby
+# In a migration in your host app
+add_index :footprints, "(metadata->>'device_id')", name: "idx_footprints_device_id"
+add_index :footprints, "(metadata->>'app_version')", name: "idx_footprints_app_version"
+```
+
+**Option 2: Promote to columns** — for your hottest query paths (e.g., `device_id` for DAU/MAU), add dedicated columns to the `footprints` table in your host app. This gives you proper B-tree indexes and fast `DISTINCT` counts:
+
+```ruby
+# In a migration in your host app
+add_column :footprints, :device_id,    :string
+add_column :footprints, :app_version,  :string
+add_column :footprints, :platform,     :string
+
+add_index :footprints, :device_id
+add_index :footprints, :app_version
+```
+
+Then write to both the column and the metadata hash in your tracking code. The gem stays generic; your app adds the columns it needs.
+
+> [!TIP]
+> Which metadata keys to promote depends on your use case. A licensing SaaS might promote `device_id` + `app_version`. An e-commerce app might promote `product_id` + `session_id`. A CMS might promote `page_url` + `referrer`. Keep the JSONB for everything else.
+
+### Database compatibility
+
+| Feature | PostgreSQL | MySQL 5.7+ | SQLite |
+|---|---|---|---|
+| JSONB `metadata` column | `jsonb` (native, fast) | `json` (native) | `text` (stored as string) |
+| GIN index on `metadata` | Supported | Not supported | Not supported |
+| JSON queries (`->>`, `@>`) | Full support | `JSON_EXTRACT()` syntax | `json_extract()` via extension |
+| Expression indexes | Supported | Supported (generated columns) | Not supported |
+
+PostgreSQL is the recommended database for `footprinted`. It has the best JSONB support, GIN indexes for containment queries, and expression indexes for key extraction. MySQL works but uses different JSON syntax. SQLite works for development and testing but stores metadata as text and has limited JSON query support.
 
 ## Async mode with ActiveJob
 
@@ -238,7 +280,7 @@ You need a working ActiveJob backend (Sidekiq, Solid Queue, etc.) for this to wo
 | `latitude` | `37.7749` |
 | `longitude` | `-122.4194` |
 
-If geolocation fails (network error, invalid IP, etc.), the footprint is still saved -- just without geolocation data. Errors are logged via `Rails.logger`.
+If geolocation fails (network error, invalid IP, etc.), the footprint is still saved — just without geolocation data. Errors are logged via `Rails.logger`.
 
 If you already know the `country_code`, you can set it directly and geolocation will be skipped:
 
@@ -269,17 +311,6 @@ The install generator creates two things:
 rails generate footprinted:install
 rails db:migrate
 ```
-
-## Testing
-
-Run the test suite with:
-
-```bash
-bundle install
-bundle exec rake test
-```
-
-The test suite uses SQLite3 in-memory database and requires no additional setup.
 
 ## Development
 
