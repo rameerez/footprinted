@@ -329,6 +329,16 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
+### Releasing a new version
+
+When bumping the version, update all three of these together:
+
+1. `lib/footprinted/version.rb` — the version constant
+2. `gemfiles/*.gemfile.lock` — run `bundle exec appraisal install` to regenerate
+3. `test/footprinted/version_test.rb` — the hardcoded version assertion
+
+CI will fail if any of these are out of sync.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/rameerez/footprinted. Our code of conduct is: just be nice and make your mom proud of what you do and post online.
