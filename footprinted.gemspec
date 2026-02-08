@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["rameerez"]
   spec.email = ["rubygems@rameerez.com"]
 
-  spec.summary = "Track IP-geolocated user activity in your Rails app"
-  spec.description = "Track user activity with associated IP addresses, geolocation info, and metadata, easily and with minimal setup. Supports async tracking via ActiveJob. It's good for tracking profile views, downloads, login attempts, or any user interaction where location matters."
+  spec.summary = "Track events with IP geolocation and metadata in your Rails app"
+  spec.description = "Add event tracking to any Rails model easily. Every event adds automatic IP geolocation, and any arbitrary metadata you may want to add. The gem comes with polymorphic associations, and async support via ActiveJob, so you can track events in the background without any overhead. Great for tracking login attempts, file downloads, profile visits, or any interaction where knowing the where matters. It also allows you to trivially build analytics dashboards and audit logs for all your app events."
   spec.homepage = "https://github.com/rameerez/footprinted"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
@@ -36,5 +36,5 @@ Gem::Specification.new do |spec|
   spec.metadata["rubygems_mfa_required"] = "true"
 
   spec.add_dependency "rails", ">= 7.0"
-  spec.add_dependency "trackdown", "~> 0.2"
+  spec.add_dependency "trackdown", "~> 0.3"
 end

@@ -3,7 +3,7 @@ PATH
   specs:
     footprinted (0.2.0)
       rails (>= 7.0)
-      trackdown (~> 0.2)
+      trackdown (~> 0.3)
 
 GEM
   remote: https://rubygems.org/
@@ -255,7 +255,7 @@ GEM
     stringio (3.2.0)
     thor (1.5.0)
     timeout (0.6.0)
-    trackdown (0.2.0)
+    trackdown (0.3.0)
       countries (~> 7.0)
     tsort (0.2.0)
     tzinfo (2.0.6)
