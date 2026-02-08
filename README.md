@@ -1,4 +1,4 @@
-# 👣 `footprinted` - Track events with geolocation and metadata in your Rails app
+# 👣 `footprinted` - Simple event tracking for Rails apps
 
 [![Gem Version](https://badge.fury.io/rb/footprinted.svg)](https://badge.fury.io/rb/footprinted) [![Build Status](https://github.com/rameerez/footprinted/workflows/Tests/badge.svg)](https://github.com/rameerez/footprinted/actions)
 
