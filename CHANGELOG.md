@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.1] - 2026-02-09
+
+- Fix async mode: change Railtie to Engine so `TrackJob` is autoloaded
+
 ## [0.2.0] - 2026-02-08
 
 **Full rewrite.** Breaking changes from v0.1.0.
