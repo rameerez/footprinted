@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Footprinted
-  class Railtie < Rails::Railtie
+  class Engine < Rails::Engine
     initializer "footprinted.initialize" do
       ActiveSupport.on_load(:active_record) do
         extend Footprinted::Model

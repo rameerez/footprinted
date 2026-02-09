@@ -25,4 +25,4 @@ module Footprinted
   end
 end
 
-require "footprinted/railtie" if defined?(Rails)
+require "footprinted/engine" if defined?(Rails)
