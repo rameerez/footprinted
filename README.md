@@ -245,7 +245,41 @@ add_index :footprints, :device_id
 add_index :footprints, :app_version
 ```
 
-Then write to both the column and the metadata hash in your tracking code. The gem stays generic; your app adds the columns it needs.
+Your tracking calls stay the same — just pass everything in `metadata` as before. To auto-promote metadata keys into their dedicated columns, add a `before_save` callback in an initializer:
+
+```ruby
+# config/initializers/footprinted_extensions.rb
+
+# String columns that map 1:1 from metadata
+FOOTPRINT_PROMOTED_STRING_COLUMNS = %w[device_id app_version platform].freeze
+
+# Integer columns that need casting
+FOOTPRINT_PROMOTED_INTEGER_COLUMNS = %w[cpu_cores memory_gb].freeze
+
+Rails.configuration.to_prepare do
+  Footprinted::Footprint.class_eval do
+    before_save :promote_metadata_columns
+
+    private
+
+    def promote_metadata_columns
+      return if metadata.blank?
+
+      m = metadata.stringify_keys
+
+      FOOTPRINT_PROMOTED_STRING_COLUMNS.each do |key|
+        self[key] = m[key] if self[key].blank? && m[key].present?
+      end
+
+      FOOTPRINT_PROMOTED_INTEGER_COLUMNS.each do |key|
+        self[key] = m[key].to_i if self[key].blank? && m[key].present?
+      end
+    end
+  end
+end
+```
+
+This works regardless of how footprints are created — via `TrackJob` (async), direct `.create!`, or the Rails console. The gem stays generic; your app adds the columns and promotion logic it needs.
 
 > [!TIP]
 > Which metadata keys to promote depends on your use case. A licensing SaaS might promote `device_id` + `app_version`. An e-commerce app might promote `product_id` + `session_id`. A CMS might promote `page_url` + `referrer`. Keep the JSONB for everything else.
