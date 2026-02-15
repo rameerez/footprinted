@@ -310,6 +310,21 @@ When async is enabled, `track` and `track_<event_type>` calls enqueue a `Footpri
 
 You need a working ActiveJob backend (Sidekiq, Solid Queue, etc.) for this to work.
 
+### Geolocation in async mode
+
+When you pass `request:` in async mode, geolocation data is extracted **immediately** (before enqueueing) using Cloudflare headers via [`trackdown`](https://github.com/rameerez/trackdown). This means:
+
+- **No MaxMind database needed** in your background workers if you use Cloudflare
+- Geo data is captured at request time, not in the job
+- If `request:` is not passed, the job falls back to MaxMind lookup
+
+```ruby
+# In your controller — pass request: for Cloudflare geo extraction
+@product.track(:purchase, ip: request.remote_ip, request: request)
+```
+
+This is the recommended pattern for async mode behind Cloudflare.
+
 ## Geolocation via Trackdown
 
 `footprinted` automatically resolves geolocation data from IP addresses using the [`trackdown`](https://github.com/rameerez/trackdown) gem. For every footprint, the following fields are populated:

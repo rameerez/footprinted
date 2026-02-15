@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    footprinted (0.2.1)
+    footprinted (0.3.0)
       rails (>= 7.0)
       trackdown (~> 0.3)
 
