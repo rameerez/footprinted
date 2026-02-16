@@ -11,6 +11,13 @@ module Footprinted
       attrs = attributes.symbolize_keys
       attrs[:occurred_at] = Time.parse(attrs[:occurred_at]) if attrs[:occurred_at].is_a?(String)
 
+      # Log geo data status for debugging
+      if attrs[:country_code].present?
+        Rails.logger.debug { "[Footprinted] TrackJob received pre-extracted geo: #{attrs[:country_code]}/#{attrs[:city]}" }
+      else
+        Rails.logger.debug { "[Footprinted] TrackJob has no pre-extracted geo, will attempt lookup for #{attrs[:ip]}" }
+      end
+
       trackable.footprints.create!(attrs)
     end
   end

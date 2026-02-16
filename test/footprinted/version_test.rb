@@ -8,7 +8,7 @@ class Footprinted::VersionTest < ActiveSupport::TestCase
   end
 
   def test_version_is_correct
-    assert_equal "0.2.1", Footprinted::VERSION
+    assert_equal "0.3.0", Footprinted::VERSION
   end
 
   def test_version_is_a_string

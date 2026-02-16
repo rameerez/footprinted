@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0] - 2026-02-15
+
+- **Async mode now extracts geo data at enqueue time** when `request:` is passed
+  - Cloudflare headers are captured before the job is enqueued
+  - Background jobs no longer need MaxMind to get geo data
+  - Falls back to MaxMind lookup in the job if `request:` wasn't passed
+- No breaking changes — existing code works unchanged
+
 ## [0.2.1] - 2026-02-09
 
 - Fix async mode: change Railtie to Engine so `TrackJob` is autoloaded

@@ -214,6 +214,44 @@ class Footprinted::ModelTest < ActiveSupport::TestCase
     end
   end
 
+  def test_track_async_extracts_geo_data_when_request_passed
+    Footprinted.configuration.async = true
+
+    # Stub Trackdown to return geo data when request is passed
+    mock_location = Struct.new(:country_code, :country_name, :city, :region, :continent, :timezone, :latitude, :longitude).new(
+      "US", "United States", "San Francisco", "California", "NA", "America/Los_Angeles", 37.7749, -122.4194
+    )
+    stub_trackdown_locate_with_request(mock_location)
+
+    mock_request = Object.new
+
+    assert_enqueued_with(
+      job: Footprinted::TrackJob,
+      args: ->(args) {
+        attrs = args[2]
+        attrs[:country_code] == "US" &&
+        attrs[:city] == "San Francisco" &&
+        attrs[:latitude] == 37.7749
+      }
+    ) do
+      @article.track("view", ip: "8.8.8.8", request: mock_request)
+    end
+  end
+
+  def test_track_async_without_request_does_not_extract_geo_data
+    Footprinted.configuration.async = true
+
+    assert_enqueued_with(
+      job: Footprinted::TrackJob,
+      args: ->(args) {
+        attrs = args[2]
+        !attrs.key?(:country_code)
+      }
+    ) do
+      @article.track("view", ip: "8.8.8.8")
+    end
+  end
+
   # -- footprints association via track --
 
   def test_track_adds_to_footprints_association
@@ -229,6 +267,17 @@ class Footprinted::ModelTest < ActiveSupport::TestCase
     verbose_was, $VERBOSE = $VERBOSE, nil
     Trackdown.define_singleton_method(:locate) do |ip, request: nil|
       location
+    end
+  ensure
+    $VERBOSE = verbose_was
+  end
+
+  def stub_trackdown_locate_with_request(location)
+    verbose_was, $VERBOSE = $VERBOSE, nil
+    empty_location = Struct.new(:country_code, :country_name, :city, :region, :continent, :timezone, :latitude, :longitude).new(nil, nil, nil, nil, nil, nil, nil, nil)
+    Trackdown.define_singleton_method(:locate) do |ip, request: nil|
+      # Only return geo data when request is passed
+      request ? location : empty_location
     end
   ensure
     $VERBOSE = verbose_was
