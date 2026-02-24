@@ -49,7 +49,7 @@ module Footprinted
       self.latitude      = location.latitude
       self.longitude     = location.longitude
     rescue => e
-      Rails.logger.error "[Footprinted] Geolocation failed for #{ip}: #{e.message}"
+      Rails.logger.error "[Footprinted] Geolocation failed for #{ip} (#{e.class}): #{e.message}"
     end
   end
 end
