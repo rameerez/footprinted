@@ -91,6 +91,8 @@ DEFAULT_LOCATION = MockLocationResult.new(
 
 # Stub Trackdown module if not already defined by the gem
 module Trackdown
+  class Error < StandardError; end
+
   def self.locate(ip, request: nil)
     DEFAULT_LOCATION
   end

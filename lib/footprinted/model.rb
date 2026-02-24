@@ -86,6 +86,9 @@ module Footprinted
       if location.country_code.present?
         Rails.logger.debug { "[Footprinted] Extracted geo at enqueue: #{location.country_code}/#{location.city} for #{ip}" }
       end
+    rescue => e
+      # Geo-lookup failed (e.g., private IP, network error), but we still want to create the footprint
+      Rails.logger.debug { "[Footprinted] Geo enrichment skipped (#{e.class}): #{e.message}" }
     end
   end
 end

@@ -215,11 +215,47 @@ class Footprinted::ModelEdgeCasesTest < ActiveSupport::TestCase
     end
   end
 
+  # -- Geo error graceful degradation --
+
+  def test_async_track_still_enqueues_job_when_geo_lookup_fails
+    Footprinted.configuration.async = true
+
+    # Stub Trackdown to raise an error (e.g., private IP rejected)
+    stub_trackdown_locate_error("Private IP addresses are not allowed")
+
+    # Should still enqueue the job without geo data
+    assert_enqueued_with(
+      job: Footprinted::TrackJob,
+      args: ->(args) {
+        attrs = args[2]
+        attrs[:ip] == "192.168.1.1" &&
+          attrs[:event_type] == "view" &&
+          attrs[:metadata] == { sdk_version: "1.0" } &&
+          attrs[:country_code].nil?  # No geo data due to error
+      }
+    ) do
+      @article.track_view(
+        ip: "192.168.1.1",
+        request: Object.new,
+        metadata: { sdk_version: "1.0" }
+      )
+    end
+  end
+
   private
 
   def parsed_metadata(footprint)
     metadata = footprint.metadata
     metadata.is_a?(String) ? JSON.parse(metadata) : metadata
+  end
+
+  def stub_trackdown_locate_error(message)
+    verbose_was, $VERBOSE = $VERBOSE, nil
+    Trackdown.define_singleton_method(:locate) do |ip, request: nil|
+      raise Trackdown::Error, message
+    end
+  ensure
+    $VERBOSE = verbose_was
   end
 
   def stub_trackdown_locate(location)
