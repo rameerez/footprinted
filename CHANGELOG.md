@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.1] - 2026-02-24
+
+- Handle geo-lookup failures gracefully — footprints are still created without geo data if `Trackdown.locate` fails (e.g., private IPs, network errors)
+
 ## [0.3.0] - 2026-02-15
 
 - **Async mode now extracts geo data at enqueue time** when `request:` is passed
