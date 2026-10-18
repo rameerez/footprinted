@@ -8,5 +8,6 @@
 /tmp/
 /dist/
 Gemfile.lock
+gemfiles/*.lock
 *.gem
 TODO

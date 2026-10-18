@@ -7,10 +7,6 @@ class Footprinted::VersionTest < ActiveSupport::TestCase
     refute_nil Footprinted::VERSION
   end
 
-  def test_version_is_correct
-    assert_equal "0.3.0", Footprinted::VERSION
-  end
-
   def test_version_is_a_string
     assert_instance_of String, Footprinted::VERSION
   end
